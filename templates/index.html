@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adaptive Bitrate Audio System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🎵 Adaptive Bitrate Audio System</h1>
+            <p class="subtitle">Intelligent audio compression based on bandwidth and energy analysis</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel: Controls -->
+            <div class="left-panel">
+                <div class="panel-section">
+                    <h2>Audio File Selection</h2>
+                    <select id="audioFile" class="input-field">
+                        <option value="">-- Select audio file --</option>
+                        {% for file in audio_files %}
+                        <option value="{{ file }}">{{ file }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="panel-section">
+                    <h2>Bandwidth Settings</h2>
+                    <div class="slider-container">
+                        <label for="bandwidthSlider">Available Bandwidth (Mbps)</label>
+                        <input type="range" id="bandwidthSlider" min="0.5" max="100" step="0.5" value="10">
+                        <div class="slider-display">
+                            <span id="bandwidthValue">10</span> Mbps
+                        </div>
+                    </div>
+
+                    <div class="quick-scenarios">
+                        <h3>Quick Scenarios</h3>
+                        <div id="scenariosContainer"></div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h2>Analysis Options</h2>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="frameWiseToggle" checked>
+                            Frame-wise Adaptive Bitrate
+                        </label>
+                    </div>
+                    <div class="frame-options" style="display: none;">
+                        <label>Frame Size:</label>
+                        <input type="number" id="frameSize" value="2048" class="input-field">
+                        <label>Hop Size:</label>
+                        <input type="number" id="hopSize" value="512" class="input-field">
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <div class="button-group">
+                        <button id="analyzeBtn" class="btn btn-primary">📊 Analyze</button>
+                        <button id="encodeBtn" class="btn btn-success">⚙️ Encode</button>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h2>Energy Statistics</h2>
+                    <div id="statsContainer" class="stats-box">
+                        <p>Select a file to see statistics</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Visualizations -->
+            <div class="right-panel">
+                <div class="chart-container">
+                    <h2>Frame-wise Energy & Bitrate</h2>
+                    <div id="energyBitrateChartContainer">
+                        <canvas id="energyBitrateChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h2>Bitrate Distribution by Energy Level</h2>
+                    <div id="bitratePieContainer">
+                        <canvas id="bitratePieChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h2>Quality Metrics</h2>
+                    <div id="metricsContainer" class="metrics-display">
+                        <p>Metrics will appear after encoding</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" style="display: none;">
+            <h2>Encoding Results</h2>
+            <div id="resultsContainer" class="results-box"></div>
+        </div>
+
+        <!-- Status Bar -->
+        <div id="statusBar" class="status-bar">
+            Ready
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+        <div class="spinner"></div>
+        <p>Processing...</p>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
