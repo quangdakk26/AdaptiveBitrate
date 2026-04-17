@@ -206,10 +206,13 @@ def encode_with_chunk_adaptive_bitrate(
         hop_size=hop_size
     )
     
+<<<<<<< HEAD
     # Get frame energies
     calculator = AudioEnergyCalculator(audio_path)
     frame_energies = calculator.frame_energy(frame_size=frame_size, hop_size=hop_size)
     
+=======
+>>>>>>> 2ecf02c (sua loi)
     # Load original audio for reference
     original_wav, sr = torchaudio.load(audio_path)
     original_wav = convert_audio(original_wav, sr, model.sample_rate, model.channels)
@@ -300,7 +303,11 @@ def encode_with_chunk_adaptive_bitrate(
         f.write(f"Total Frames: {len(bitrate_schedule)}\n")
         f.write(f"\n{'Frame':<6} {'Energy':<15} {'Norm.Energy':<12} {'Energy_Level':<15} {'Bitrate':<10}\n")
         f.write("-" * 70 + "\n")
+<<<<<<< HEAD
         for i, (energy, bitrate, elevel) in enumerate(zip(frame_energies, bitrate_schedule, energy_levels)):
+=======
+        for i, (energy, bitrate, elevel) in enumerate(zip(stats.get('frame_energies', []), bitrate_schedule, energy_levels)):
+>>>>>>> 2ecf02c (sua loi)
             norm_energy = energy / stats['max'] if stats['max'] > 0 else 0
             f.write(f"{i:<6} {energy:<15.6e} {norm_energy:<12.4f} {elevel:<15} {bitrate:>5.1f} kbps\n")
     
