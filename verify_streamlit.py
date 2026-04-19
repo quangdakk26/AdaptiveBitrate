@@ -52,7 +52,7 @@ def check_modules():
     print("🔍 Checking modules...\n")
     
     modules_to_check = [
-        ('03_audio_energy.py', 'AudioEnergyCalculator'),
+        ('audio_energy.py', 'AudioEnergyCalculator'),
         ('streamlit_app.py', 'AdaptiveBitrateSimulator'),
     ]
     
