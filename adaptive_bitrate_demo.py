@@ -12,6 +12,7 @@ import pandas as pd
 from audio_analyzer import AudioFeatureAnalyzer
 from network_simulator import NetworkSimulator
 from adaptive_bitrate import AdaptiveBitrateSelector
+from metrics import snr_db, mse, compression_ratio
 import warnings
 warnings.filterwarnings('ignore')
 import soundfile as sf
@@ -296,6 +297,18 @@ def create_playback_widget(audio, sr, features_list, chunk_times, selected_bitra
         
         st.audio(simulated_audio, sample_rate=sr, format="audio/wav")
         
+        # Calculate quality metrics
+        # Normalize original audio for comparison
+        original_normalized = np.float32(audio / np.max(np.abs(audio)))
+        
+        snr_value = snr_db(original_normalized, simulated_audio)
+        mse_value = mse(original_normalized, simulated_audio)
+        
+        # Estimate compression ratio (approximate)
+        original_bits = len(audio) * 16  # Assuming 16-bit audio
+        compressed_bits = len(simulated_audio) * 16 * (avg_bitrate / 1411)  # 1411 kbps = CD quality
+        comp_ratio = compression_ratio(original_bits, compressed_bits) if compressed_bits > 0 else 1.0
+        
         # Show bitrate statistics
         col_stats1, col_stats2, col_stats3 = st.columns(3)
         with col_stats1:
@@ -304,6 +317,16 @@ def create_playback_widget(audio, sr, features_list, chunk_times, selected_bitra
             st.metric("Min Bitrate", f"{np.min(selected_bitrates):.1f} kbps")
         with col_stats3:
             st.metric("Max Bitrate", f"{np.max(selected_bitrates):.1f} kbps")
+        
+        # Show quality metrics
+        st.markdown("#### Quality Metrics")
+        col_quality1, col_quality2, col_quality3 = st.columns(3)
+        with col_quality1:
+            st.metric("SNR (dB)", f"{snr_value:.2f}")
+        with col_quality2:
+            st.metric("MSE", f"{mse_value:.6f}")
+        with col_quality3:
+            st.metric("Compression Ratio", f"{comp_ratio:.2f}x")
         
         # Show quality vs bitrate
         st.markdown("#### Bitrate Over Time")
@@ -356,6 +379,16 @@ def create_playback_widget(audio, sr, features_list, chunk_times, selected_bitra
                     
                     st.audio(sim_audio, sample_rate=sr, format="audio/wav")
                     
+                    # Calculate quality metrics
+                    original_normalized = np.float32(audio / np.max(np.abs(audio)))
+                    snr_value = snr_db(original_normalized, sim_audio)
+                    mse_value = mse(original_normalized, sim_audio)
+                    
+                    # Estimate compression ratio
+                    original_bits = len(audio) * 16
+                    compressed_bits = len(sim_audio) * 16 * (bitrate / 1411)
+                    comp_ratio = compression_ratio(original_bits, compressed_bits) if compressed_bits > 0 else 1.0
+                    
                     # Quality assessment
                     if bitrate <= 8:
                         quality = "🔴 Very Low"
@@ -371,6 +404,11 @@ def create_playback_widget(audio, sr, features_list, chunk_times, selected_bitra
                         quality = "🟢 Excellent"
                     
                     st.caption(f"Quality: {quality}")
+                    
+                    # Show metrics
+                    st.metric("SNR", f"{snr_value:.1f} dB", delta=None)
+                    st.metric("MSE", f"{mse_value:.6f}", delta=None)
+                    st.metric("Ratio", f"{comp_ratio:.2f}x", delta=None)
 
 
 def main():
